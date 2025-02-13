@@ -1,0 +1,47 @@
+\documentclass[hyperref, twocolumn]{article}
+\usepackage[a4paper, landscape, top=1.5cm, bottom=1.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{ctex}
+\usepackage{listings}
+\usepackage{lipsum}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\usepackage{hyperref}
+
+\hypersetup{hidelinks}
+\linespread{1}
+\lstset{
+    basicstyle=\fontspec{Consolas}\small, % 基本字体样式
+    keywordstyle=\bfseries\color{purple}, % 关键字颜色
+    commentstyle=\fontspec{Consolas}\color{green!50!black}, % 注释颜色
+    stringstyle=\itshape\color{blue}, % 字符串颜色
+    numbers=left, % 显示行号
+    numberstyle=\tiny\color{gray}, % 行号样式
+    breaklines=true, % 自动换行
+    tabsize=4, % 制表符宽度
+}
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    {\Huge\bfseries 老司机带带我\par}
+    \vspace{10cm}
+
+    {\Large 吴子健 \quad 林宇煌 \quad 朱芝毅 \par}
+    \vspace{0.5cm}
+
+    {\large \today\par}
+    \vspace{2cm}
+\end{titlepage}
+
+\tableofcontents
+
+\include{sections/basic_algorithms}
+\include{sections/data_structure}
+\include{sections/concrete_math}
+\include{sections/algebra_and_game_theory}
+\include{sections/graphs}
+\include{sections/geometry}
+
+\end{document}
