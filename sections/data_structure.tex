@@ -1,0 +1,112 @@
+\section{数据结构}
+
+\subsection{分块}
+
+\subsection{Treap}
+
+\subsection{主席树}
+
+\subsection{动态图连通性 (线段树分治+可撤销并查集)}
+利用线段树对询问进行划分, 每个叶子节点对应一个时间点. 记每条边的存在时间为 $[l, r]$, 将该区间插入线段树中, 线段树的每个节点记录对应时间段内存在的边. 建完树后 dfs 遍历线段树, 访问至叶节点回答询问. 回溯时撤销当前节点对并查集的操作.
+\begin{lstlisting}[language=C++]
+\\LOJ 121
+#include<bits/stdc++.h>
+using namespace std;
+
+using pii = pair<int, int>;
+const int N = 5e3+10, M = 5e5+10;
+map<pii, int> mp;
+int n, m, ans[M];
+pii q[M];
+vector<pii> tr[M*20];
+
+struct operation{
+    int x, y, s_x;
+};
+struct DSU{
+    int num;
+    vector<int> f, s;
+    stack<operation> op;
+    DSU() {}
+    DSU(int sz){
+        num = sz;
+        f = vector<int> (num+1, 0);
+        s = vector<int> (num+1, 1);
+        iota(f.begin(), f.end(), 0);
+    }
+    int find(int x){
+        if(f[x] == x) return x;
+        return find(f[x]);
+    }
+    void merge(int x, int y){
+        x = find(x); y = find(y);
+        if(s[x] > s[y]) swap(x, y);
+        op.push({x, y, s[x]});
+        if(x != y){
+            f[x] = y;
+            s[y] += x; s[x] = 0;
+        }
+    }
+    void split(){
+        auto [x, y, s_x] = op.top();  
+        op.pop();
+        if(x == y) return ;
+        f[x] = x;
+        s[x] = s_x; s[y] -= s_x;
+    }
+    void back(int x){
+        for(int i = 1; i <= x; i++) split();
+    }
+}g;
+void insert(int k, int l, int r, int L, int R, pii e){
+    if(l >= L && r <= R){
+        tr[k].push_back(e);
+        return ;
+    }
+    int mid = (l+r)>>1;
+    if(mid >= L) insert(k<<1, l, mid, L, R, e);
+    if(mid < R) insert((k<<1)|1, mid+1, r, L, R, e);
+}
+void dfs(int k, int l, int r){
+    for(auto [x, y]: tr[k])
+        g.merge(x, y);
+    if(l == r){
+        auto [x, y] = q[l];
+        if(x == 0 && y == 0) {g.back(tr[k].size()); ans[l] = -1; return ;}
+        if(g.find(x) == g.find(y)) ans[l] = 1;
+        else ans[l] = 0;
+        g.back(tr[k].size());
+        return ;
+    }
+    int mid = (l+r)>>1;
+    dfs(k<<1, l, mid);
+    dfs((k<<1)|1, mid+1, r);
+    g.back(tr[k].size());
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin >> n >> m;
+    for(int i = 1; i <= m; i++){
+        int op, x, y;
+        cin >> op >> x >> y;
+        if(x > y) swap(x, y);
+        q[i] = {0, 0};
+        if(op == 0) mp[{x, y}] = i;
+        else if(op == 1){
+            insert(1, 1, m, mp[{x, y}], i-1, {x, y});
+            mp[{x, y}] = 0;
+        }
+        else q[i] = {x, y};
+    }
+    for(auto [e, i]: mp)
+        if(i) insert(1, 1, m, i, m, e);
+    g = DSU(n);
+    dfs(1, 1, m);
+    for(int i = 1; i <= m; i++) if(ans[i] != -1){
+        if(ans[i]) cout << "Y\n";
+        else cout << "N\n";
+    }
+    return 0;
+}
+\end{lstlisting}
